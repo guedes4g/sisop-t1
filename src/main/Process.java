@@ -7,15 +7,15 @@ import java.util.List;
 public class Process implements Comparable<Object> {
 	List<Integer> inOut;
 
-	public int id;
-	public int tempoDeChegada;
+	private int id;
+	private int tempoDeChegada;
 	private int tempoDeExecucao;
-	public int prioridade;
+	private int prioridade;
 	private int tempoRodando = 0; // tempo da fatia de tempo
-	public int tempoRodandoTotal = 0;
-	public int tempoDeInicioInOut;
+	private int tempoRodandoTotal = 0;
+	private int tempoDeInicioInOut;
 	private int tempoDeEspera = 0;
-	public int tempoDeResposta = -1;
+	private int tempoDeResposta = -1;
 	
 	public Process(int tempoDeChegada, int tempoDeExecucao, int prioridade, int id, List<Integer> inOut) {
 		this.id = id;
@@ -61,18 +61,36 @@ public class Process implements Comparable<Object> {
 	public int getAnswerTime() {
 		return tempoDeResposta;
 	}
+
+	public int getArrivalTime() {
+		return tempoDeChegada;
+	}
 	
 	public boolean shouldInOut() {
-		if(inOut == null)
+		if (inOut == null)
 			return false;
 
-		for(int i = 0; i < inOut.size(); i++) {
-			if(tempoRodandoTotal +1 == inOut.get(i)) {
+		int runTime = tempoRodandoTotal + 1;
+
+		for (int i = 0; i < inOut.size(); i++) {
+			if (runTime == inOut.get(i)) {
 				inOut.remove(i);
 				return true;
 			}
 		}
 		return false;
+	}
+
+	public int getPriority() {
+		return prioridade;
+	}
+
+	public int getInOutTime() {
+		return tempoDeInicioInOut;
+	}
+
+	public void setInOutTime(int t) {
+		tempoDeInicioInOut = t;
 	}
 
 	@Override

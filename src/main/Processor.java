@@ -89,6 +89,11 @@ public class Processor {
 		}
 	}
 
+	public void printStats() {
+		printRoundRobin();
+		printAverageStats();
+	}
+
 	private void runProcess() {
 		//execute it
 		running.get(0).run();
@@ -99,11 +104,6 @@ public class Processor {
 
 	private boolean shouldEndTimeSlice() {
 		return !running.isEmpty() ? running.get(0).getRunningTime() >= universe.getFatiaDeTempo() : false;
-	}
-
-	public void printStats() {
-		printRoundRobin();
-		printAverageStats();
 	}
 
 	private void printRoundRobin() {
@@ -132,7 +132,7 @@ public class Processor {
 		List<Process> res = new ArrayList<>();
 
 		for (int i = 0 ; i < inOut.size(); i++)
-			if (inOut.get(i).tempoDeInicioInOut + universe.InOutTime == currentTime)
+			if (inOut.get(i).getInOutTime() + universe.InOutTime == currentTime)
 				res.add(inOut.remove(i));
 
 		return res;
@@ -144,7 +144,7 @@ public class Processor {
 
 		if (!running.isEmpty() && running.get(0).shouldInOut()) {
 			p = running.remove(0);
-			p.tempoDeInicioInOut = currentTime;
+			p.setInOutTime(currentTime);
 			p.resetRunningTime();
 
 			inOut.add(p);
@@ -185,20 +185,20 @@ public class Processor {
 			p.incrementWaitTime();
 	}
 
-	public boolean addAndShouldInterrupt(List<Process> plist) {
+	private boolean addAndShouldInterrupt(List<Process> plist) {
 		running.addAll(plist);
 
 		if (running.isEmpty())
 			return false;
 
 		for (int i = 0; i < plist.size(); i++)
-			if (running.get(0).prioridade > plist.get(i).prioridade)
+			if (running.get(0).getPriority() > plist.get(i).getPriority())
 				return true;
 
 		return false;
 	}
 	
-	public void rotate() {
+	private void rotate() {
 		lastp = null;
 
 		if (!running.isEmpty()) {
@@ -207,7 +207,7 @@ public class Processor {
 
 			int i = 0;
 			for (i = 0; i < running.size() ; i++) {
-				if (aux.prioridade >= running.get(i).prioridade)
+				if (aux.getPriority() >= running.get(i).getPriority())
 					continue;
 				else
 					break;

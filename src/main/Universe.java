@@ -38,7 +38,7 @@ public class Universe {
 		ArrayList<Process> res = new ArrayList<Process>();
 
 		for(int i = 0; i < listOfProcess.size(); i ++)
-			if(listOfProcess.get(i).tempoDeChegada == t)
+			if(listOfProcess.get(i).getArrivalTime() == t)
 				res.add(listOfProcess.remove(i));
 
 		return res;
