@@ -205,25 +205,36 @@ public class Processor {
 	}
 	
 	private void rotate() {
+		int gap = 0;
 
 		if (!running.isEmpty()) {
-			Process aux = running.remove(0);
+			gap = countProcessHavingMorePriority();
 
-			int i = 0;
-			for (i = 0; i < running.size() ; i++) {
-				if (aux.getPriority() >= running.get(i).getPriority())
-					continue;
-				else
-					break;
+			//then means, we have more than one process to give the opportunity to run
+			if (gap > 1) {
+				//remove the current from the queue
+			 	running.remove(current);
+
+			 	//add into the new position (based on gap)
+			 	running.add(gap -1, current);
+
+			 	//refresh the current
+			 	current = running.get(0);
 			}
-
-			running.add(i, aux);
-
-			current = running.get(0);
 		}
 
 		//change context
 		outputRoundRobin.add("C");
+	}
+
+	private int countProcessHavingMorePriority() {
+		int res = 0;
+
+		for (Process p : running)
+			if (current.getPriority() >= p.getPriority())
+				res++;
+
+		return res;
 	}
 	
 	public void orderRunningPriority() {
