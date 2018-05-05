@@ -9,12 +9,10 @@ import java.util.*;
 public class Universe {
 	public final int InOutTime = 4;
 
-	private int numeroDeProcesso;
 	private int fatiaDeTempo;
 	private List<Process> listOfProcess = new ArrayList<>();
 	
-	public Universe(int numeroDeProcesso, int fatiaDeTempo) {
-		this.numeroDeProcesso = numeroDeProcesso;
+	public Universe(int fatiaDeTempo) {
 		this.fatiaDeTempo = fatiaDeTempo;
 	}
 	
@@ -54,18 +52,22 @@ public class Universe {
 			//Reseta lista de inOut
 			inOut = null;
 
-			//LINHA 1: número de processos,
+			//LINHA 1: número de processos (ignorar)
 			int numeroDeProcesso = Integer.parseInt(br.readLine());
 
 			//LINHA 2: tamanho de fatia de tempo,
 			int fatiaDeTempo =  Integer.parseInt(br.readLine());
 
 			//cria o universo a partir dos dados coletados do arquivo
-			universe = new Universe(numeroDeProcesso, fatiaDeTempo);
+			universe = new Universe(fatiaDeTempo);
 
 			//lê as linhas restantes
 			//Para cada processo:
-			while ((line = br.readLine()) != null) {
+			for (int j = 0; j < numeroDeProcesso; j++) {
+				//read the line
+				line = br.readLine();
+
+				//split (similar to token)
 				String[] lineParts = line.split(" ");
 
 				//1 = tempo de chegada,
@@ -81,11 +83,13 @@ public class Universe {
 				if (lineParts.length > 3) {
 					inOut = new ArrayList<Integer>();
 
-					for(int i = 3; i < lineParts.length; i++)
+					for (int i = 3; i < lineParts.length; i++)
 						inOut.add(Integer.parseInt(lineParts[i]));
 				}
 
-				universe.addProcess(new Process(tempoDeChegada, tempoDeExecucao, prioridade, id++, inOut));
+				universe.addProcess(
+					new Process(tempoDeChegada, tempoDeExecucao, prioridade, id++, inOut)
+				);
 			}
 		}
 
