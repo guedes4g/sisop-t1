@@ -176,10 +176,10 @@ public class Processor {
 	
 	private void addWaitTime(boolean mustIncludeCurrent) {
 		//Increment the wait time for all the running jobs
-		for (int i = 0; i < running.size(); i++)
+		for (Process p : running)
 			//Check if the current process did not run
-			if (i != 0 || mustIncludeCurrent == true)
-				running.get(i).incrementWaitTime();
+			if (p != current || mustIncludeCurrent == true)
+				p.incrementWaitTime();
 
 		//Increase wait time for the process waiting for IO
 		for (Process p : inOut)
