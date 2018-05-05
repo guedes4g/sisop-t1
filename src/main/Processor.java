@@ -47,14 +47,12 @@ public class Processor {
 			//Re-order the processes by their own priority
 			orderRunningPriority();
 
-			int tempoDeEsperaOpt = 0;
-
 			//First validation: "are there any process running?"
-			if (running.isEmpty())
+			if ( running.isEmpty() )
 				outputRoundRobin.add("-");
 
 			//Second validation: did the current process end his execution?
-			else if(hasCurrentProcessDone())
+			else if( hasCurrentProcessDone() )
 				//in case it did... end it and remove from the running jobs
 				endCurrentProcess();
 
@@ -78,10 +76,9 @@ public class Processor {
 
 			//Or then, just execute the process
 			else {
-				outputRoundRobin.add(running.get(0).toString());
-
 				//execute it
-				running.get(0).run();
+				runProcess();
+
 				didCurrentRan = true;
 			}
 			
@@ -90,17 +87,21 @@ public class Processor {
 			//increment the running time
 			currentTime++;
 		}
+	}
 
-		//After the program finish execution, print the results
-		printStats();
-		
+	private void runProcess() {
+		//execute it
+		running.get(0).run();
+
+		//log
+		outputRoundRobin.add(running.get(0).toString());
 	}
 
 	private boolean shouldEndTimeSlice() {
 		return !running.isEmpty() ? running.get(0).getRunningTime() >= universe.getFatiaDeTempo() : false;
 	}
 
-	private void printStats() {
+	public void printStats() {
 		printRoundRobin();
 		printAverageStats();
 	}
