@@ -7,7 +7,6 @@ import java.util.Queue;
 
 /**
  *
- * @author guedes
  */
 public class Processor {
 	private List<Process> running = new LinkedList<>();
