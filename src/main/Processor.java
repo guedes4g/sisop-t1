@@ -28,7 +28,7 @@ public class Processor {
 		List<Process> plist, returnInOut;
 		boolean shouldInterrupt;
 
-		while (true) {
+		while (!hasFinishedExecution()) {
 			//reset current validation
 			didCurrentRan = false;
 
@@ -39,10 +39,6 @@ public class Processor {
 			//Validate if the process should be interreputed (either by "preempção" or by "IO"
 			shouldInterrupt = addAndShouldInterrupt(plist);
 			shouldInterrupt = addAndShouldInterrupt(returnInOut) || shouldInterrupt;
-
-			//End the execution in case, there is no other process running
-			if(!universe.hasProcesses() && running.isEmpty() && inOut.isEmpty())
-				break;
 
 			//Re-order the processes by their own priority
 			orderRunningPriority();
@@ -92,6 +88,10 @@ public class Processor {
 	public void printStats() {
 		printRoundRobin();
 		printAverageStats();
+	}
+
+	private boolean hasFinishedExecution() {
+		return !universe.hasProcesses() && running.isEmpty() && inOut.isEmpty();
 	}
 
 	private void runProcess() {
