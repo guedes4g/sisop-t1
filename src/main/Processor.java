@@ -25,23 +25,13 @@ public class Processor {
 	
 	public void run() {
 		boolean didCurrentRan = false;
-		List<Process> plist, returnInOut;
-		boolean shouldInterrupt;
 
 		while (!hasFinishedExecution()) {
 			//reset current validation
 			didCurrentRan = false;
 
 			//check for processes being inserted
-			plist = universe.getByTime(currentTime);
-			returnInOut = endedInOut();
-
-			//Validate if the process should be interreputed (either by "preempção" or by "IO"
-			shouldInterrupt = addAndShouldInterrupt(plist);
-			shouldInterrupt = addAndShouldInterrupt(returnInOut) || shouldInterrupt;
-
-			//Re-order the processes by their own priority
-			orderRunningPriority();
+			findProcessesToRun();
 
 			//First validation: "are there any process running?"
 			if ( running.isEmpty() )
@@ -62,7 +52,7 @@ public class Processor {
 			}
 
 			//4th validation: should we interrupt?
-			else if (shouldInterrupt)
+			else if ( shouldInterrupt() )
 				//give another priority process the opportunity to run
 				rotate();
 
@@ -100,6 +90,27 @@ public class Processor {
 
 		//log
 		outputRoundRobin.add(current.toString());
+	}
+
+	private void findProcessesToRun() {
+		List<Process> plist, returnInOut;
+
+		//get by time
+		plist = universe.getByTime(currentTime);
+
+		//get by IO interruption
+		returnInOut = endedInOut();
+
+		//add them into running list
+		running.addAll(plist);
+		running.addAll(returnInOut);
+
+		//In case we just inserted a process, set it to current
+		if (current == null && !running.isEmpty())
+			current = running.get(0);
+
+		//Re-order the processes by their priority
+		orderRunningPriority();
 	}
 
 	private boolean shouldEndTimeSlice() {
@@ -171,6 +182,9 @@ public class Processor {
 
 		//remove from running list
 		running.remove(0);
+
+		//get a new current
+		setNewCurrent();
 	}
 	
 	private void addWaitTime(boolean mustIncludeCurrent) {
@@ -185,22 +199,11 @@ public class Processor {
 			p.incrementWaitTime();
 	}
 
-	private boolean addAndShouldInterrupt(List<Process> plist) {
-		running.addAll(plist);
-
-		//In case there are no running processes
+	private boolean shouldInterrupt() {
 		if (running.isEmpty())
 			return false;
 
-		//In case we just inserted a process, set it to current
-		else if (current == null)
-			current = running.get(0);
-
-		for (int i = 0; i < plist.size(); i++)
-			if (current.getPriority() > plist.get(i).getPriority())
-				return true;
-
-		return false;
+		return current != running.get(0);
 	}
 	
 	private void rotate() {
@@ -216,10 +219,10 @@ public class Processor {
 
 			 	//add into the new position (based on gap)
 			 	running.add(gap -1, current);
-
-			 	//refresh the current
-			 	current = running.get(0);
 			}
+
+			//always refresh the current
+			setNewCurrent();
 		}
 
 		//change context
@@ -235,14 +238,15 @@ public class Processor {
 
 		return res;
 	}
-	
-	public void orderRunningPriority() {
-		if(!running.isEmpty()) {
-			Process.sortByPriority(running);
 
-			//after sorting, set to current the one in the top of list
+	private void setNewCurrent() {
+		if (!running.isEmpty())
 			current = running.get(0);
-		}
+	}
+	
+	private void orderRunningPriority() {
+		if(!running.isEmpty())
+			Process.sortByPriority(running);
 	}
 	
 }
