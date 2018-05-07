@@ -177,14 +177,15 @@ public class Processor {
 		//Add into the done list
 		done.add(current);
 
-		//and change the context
-		outputRoundRobin.add("C");
-
 		//remove from running list
 		running.remove(0);
 
 		//get a new current
 		setNewCurrent();
+
+		//and change the context
+		if (!hasFinishedExecution())
+			outputRoundRobin.add("C");
 	}
 	
 	private void addWaitTime(boolean mustIncludeCurrent) {
