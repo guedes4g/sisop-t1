@@ -67,6 +67,8 @@ public class Universe {
 			//lê as linhas restantes
 			//Para cada processo:
 			for (int j = 0; j < numeroDeProcesso; j++) {
+				inOut = null;
+
 				//read the line
 				line = br.readLine();
 
