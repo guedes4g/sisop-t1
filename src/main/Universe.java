@@ -32,12 +32,15 @@ public class Universe {
 		return fatiaDeTempo;
 	}
 	
-	public ArrayList<Process> getByTime(int t){
-		ArrayList<Process> res = new ArrayList<Process>();
+	public List<Process> getByTime(int t){
+		List<Process> res = new ArrayList<Process>();
 
-		for(int i = 0; i < listOfProcess.size(); i ++)
-			if(listOfProcess.get(i).getArrivalTime() == t)
-				res.add(listOfProcess.remove(i));
+		for (Process p : listOfProcess)
+			if (p.getArrivalTime() == t)
+				res.add(p);
+
+		for (Process p : res)
+			listOfProcess.remove(p);
 
 		return res;
 	}

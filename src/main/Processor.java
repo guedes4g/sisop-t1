@@ -52,13 +52,10 @@ public class Processor {
 			}
 
 			//4th validation: should we interrupt?
-			else if ( shouldInterrupt() )
+			//5th: check if we should stop to in/out to run
+			else if ( shouldInterrupt() || checkInOutRunningProcess())
 				//give another priority process the opportunity to run
 				rotate();
-
-			//5th: check if we should stop to in/out to run
-			else if( checkInOutRunningProcess() )
-				outputRoundRobin.add("C");
 
 			//Or then, just execute the process
 			else {
@@ -142,9 +139,12 @@ public class Processor {
 	private List<Process> endedInOut(){
 		List<Process> res = new ArrayList<>();
 
-		for (int i = 0 ; i < inOut.size(); i++)
-			if (inOut.get(i).getInOutTime() + universe.InOutTime == currentTime)
-				res.add(inOut.remove(i));
+		for (Process p : inOut)
+			if (p.getInOutTime() + universe.InOutTime == currentTime)
+				res.add(p);
+
+		for (Process p : res)
+			inOut.remove(p);
 
 		return res;
 	}

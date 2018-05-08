@@ -5,7 +5,7 @@ import java.io.IOException;
 public class App {
 	public static void main(String[] args) throws IOException {
 		//create the universe
-		Universe universe = Universe.readFile("Example.txt");
+		Universe universe = Universe.readFile("Example2.txt");
 
 		//instance the processor
 		Processor processor = new Processor(universe);
