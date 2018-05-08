@@ -35,7 +35,7 @@ public class Processor {
 			ArrayList<Process> plist = universe.getByTime(currentTime);
 			ArrayList<Process> returnInOut = endedInOut();
 			boolean didFinish = checkDoneCurrent();
-			boolean shouldInterrupt = addAndShouldInterrupt(plist); // preempção
+			boolean shouldInterrupt = addAndShouldInterrupt(plist); // preempo
 			shouldInterrupt =  addAndShouldInterrupt(returnInOut) || shouldInterrupt ; // retorno de IO
 			
 			if(universe.listOfProcess.isEmpty() && running.isEmpty() && inOut.isEmpty()) break;
@@ -85,8 +85,8 @@ public class Processor {
 		}
 		int mediaEspera = totalEspera/done.size();
 		int mediaResposta = totalResposta/done.size();
-		System.out.println("\nMédia de resposta:" + mediaResposta);
-		System.out.println("\nMédia de espera:" + mediaEspera);
+		System.out.println("\nMedia de resposta:" + mediaResposta);
+		System.out.println("\nMedia de espera:" + mediaEspera);
 
 	}
 
