@@ -53,9 +53,12 @@ public class Processor {
 
 			//4th validation: should we interrupt?
 			//5th: check if we should stop to in/out to run
-			else if ( shouldInterrupt() || checkInOutRunningProcess())
+			else if ( shouldInterrupt() )
 				//give another priority process the opportunity to run
 				rotate();
+
+			else if ( shouldCheckInOutCurrent() )
+				checkInOutCurrent();
 
 			//Or then, just execute the process
 			else {
@@ -115,11 +118,10 @@ public class Processor {
 	}
 
 	private void printRoundRobin() {
-		System.out.print("[");
 		for (String c : outputRoundRobin)
 			System.out.print(c);
 
-		System.out.println("]");
+		System.out.println("");
 	}
 	
 	private void printAverageStats() {
@@ -149,21 +151,22 @@ public class Processor {
 		return res;
 	}
 	
-	private boolean checkInOutRunningProcess() {
-		boolean checked = false;
+	private boolean shouldCheckInOutCurrent() {
+		return current != null && current.shouldInOut();
+	}
 
-		if (current != null && current.shouldInOut()) {
-			ready.remove(0);
+	private void checkInOutCurrent() {
+		ready.remove(0);
 
-			current.setInOutTime(currentTime);
-			current.resetRunningTime();
+		current.setInOutTime(currentTime);
+		current.resetRunningTime();
 
-			inOut.add(current);
+		inOut.add(current);
 
-			checked = true;
-		}
+		//reset the current position and let the rotate decide
+		setNewCurrent();
 
-		return checked;
+		outputRoundRobin.add("C");
 	}
 
 	private boolean hasCurrentProcessDone() {
