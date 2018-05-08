@@ -216,7 +216,7 @@ public class Processor {
 			 	ready.remove(current);
 
 			 	//add into the new position (based on gap)
-			 	ready.add(gap -1, current);
+			 	ready.add(gap, current);
 			}
 
 			//always refresh the current
