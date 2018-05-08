@@ -28,7 +28,10 @@ public class Process implements Comparable<Object> {
 			Collections.sort(inOut);
 	}
 	
-	public void run() {
+	public void run(int currentTime) {
+		if (tempoDeResposta < 0)
+			tempoDeResposta = (currentTime +1) - tempoDeChegada;
+
 		tempoDeExecucao--;
 		tempoRodando++;
 		tempoRodandoTotal++;
@@ -44,10 +47,6 @@ public class Process implements Comparable<Object> {
 
 	public boolean hasEnded() {
 		return tempoDeExecucao <= 0;
-	}
-	
-	public void calculateAnswerTime(int currentTime) {
-		this.tempoDeResposta = currentTime - this.tempoDeChegada ;
 	}
 
 	public void incrementWaitTime() {

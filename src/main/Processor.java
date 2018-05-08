@@ -9,7 +9,7 @@ import java.util.Queue;
  *
  */
 public class Processor {
-	private List<Process> running = new LinkedList<>();
+	private List<Process> ready = new LinkedList<>();
 	private List<Process> inOut = new ArrayList<>();
 	private List<Process> done = new LinkedList<>();
 	private Queue<String> outputRoundRobin = new LinkedList<String>();
@@ -34,7 +34,7 @@ public class Processor {
 			findProcessesToRun();
 
 			//First validation: "are there any process running?"
-			if ( running.isEmpty() )
+			if ( ready.isEmpty() )
 				outputRoundRobin.add("-");
 
 			//Second validation: did the current process end his execution?
@@ -81,12 +81,12 @@ public class Processor {
 	}
 
 	private boolean hasFinishedExecution() {
-		return !universe.hasProcesses() && running.isEmpty() && inOut.isEmpty();
+		return !universe.hasProcesses() && ready.isEmpty() && inOut.isEmpty();
 	}
 
 	private void runProcess() {
 		//execute it
-		current.run();
+		current.run(currentTime);
 
 		//log
 		outputRoundRobin.add(current.toString());
@@ -102,12 +102,12 @@ public class Processor {
 		returnInOut = endedInOut();
 
 		//add them into running list
-		running.addAll(plist);
-		running.addAll(returnInOut);
+		ready.addAll(plist);
+		ready.addAll(returnInOut);
 
 		//In case we just inserted a process, set it to current
-		if (current == null && !running.isEmpty())
-			current = running.get(0);
+		if (current == null && !ready.isEmpty())
+			current = ready.get(0);
 
 		//Re-order the processes by their priority
 		orderRunningPriority();
@@ -134,8 +134,8 @@ public class Processor {
 			answerTime += p.getAnswerTime();
 		}
 
-		System.out.println("Média de resposta: " + (waitTime / done.size()));
-		System.out.println("Média de espera: " + (answerTime / done.size()));
+		System.out.println("Média de resposta: " +((double) answerTime / done.size()));
+		System.out.println("Média de espera: " + ((double) waitTime / done.size()));
 
 	}
 
@@ -153,7 +153,7 @@ public class Processor {
 		boolean checked = false;
 
 		if (current != null && current.shouldInOut()) {
-			running.remove(0);
+			ready.remove(0);
 
 			current.setInOutTime(currentTime);
 			current.resetRunningTime();
@@ -171,14 +171,11 @@ public class Processor {
 	}
 
 	private void endCurrentProcess() {
-		//set the end time
-		current.calculateAnswerTime(currentTime -1);
-
 		//Add into the done list
 		done.add(current);
 
 		//remove from running list
-		running.remove(0);
+		ready.remove(0);
 
 		//get a new current
 		setNewCurrent();
@@ -190,7 +187,7 @@ public class Processor {
 	
 	private void addWaitTime(boolean mustIncludeCurrent) {
 		//Increment the wait time for all the running jobs
-		for (Process p : running)
+		for (Process p : ready)
 			//Check if the current process did not run
 			if (p != current || mustIncludeCurrent == true)
 				p.incrementWaitTime();
@@ -201,25 +198,25 @@ public class Processor {
 	}
 
 	private boolean shouldInterrupt() {
-		if (running.isEmpty())
+		if (ready.isEmpty())
 			return false;
 
-		return current != running.get(0);
+		return current != ready.get(0);
 	}
 	
 	private void rotate() {
 		int gap = 0;
 
-		if (!running.isEmpty()) {
+		if (!ready.isEmpty()) {
 			gap = countProcessHavingMorePriority();
 
 			//then means, we have more than one process to give the opportunity to run
 			if (gap > 1) {
 				//remove the current from the queue
-			 	running.remove(current);
+			 	ready.remove(current);
 
 			 	//add into the new position (based on gap)
-			 	running.add(gap -1, current);
+			 	ready.add(gap -1, current);
 			}
 
 			//always refresh the current
@@ -233,7 +230,7 @@ public class Processor {
 	private int countProcessHavingMorePriority() {
 		int res = 0;
 
-		for (Process p : running)
+		for (Process p : ready)
 			if (current.getPriority() >= p.getPriority())
 				res++;
 
@@ -241,13 +238,13 @@ public class Processor {
 	}
 
 	private void setNewCurrent() {
-		if (!running.isEmpty())
-			current = running.get(0);
+		if (!ready.isEmpty())
+			current = ready.get(0);
 	}
 	
 	private void orderRunningPriority() {
-		if(!running.isEmpty())
-			Process.sortByPriority(running);
+		if(!ready.isEmpty())
+			Process.sortByPriority(ready);
 	}
 	
 }
