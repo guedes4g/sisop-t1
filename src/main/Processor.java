@@ -214,12 +214,12 @@ public class Processor {
 			gap = countProcessHavingMorePriority();
 
 			//then means, we have more than one process to give the opportunity to run
-			if (gap > 1) {
+			if (gap > 0) {
 				//remove the current from the queue
 			 	ready.remove(current);
 
 			 	//add into the new position (based on gap)
-			 	ready.add(gap, current);
+			 	ready.add(gap -1, current);
 			}
 
 			//always refresh the current
