@@ -30,7 +30,7 @@ public class Process implements Comparable<Object> {
 	
 	public void run(int currentTime) {
 		if (tempoDeResposta < 0)
-			tempoDeResposta = (currentTime +1) - tempoDeChegada;
+			tempoDeResposta = currentTime - tempoDeChegada;
 
 		tempoDeExecucao--;
 		tempoRodando++;
