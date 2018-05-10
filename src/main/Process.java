@@ -33,14 +33,13 @@ public class Process implements Comparable<Object> {
 		Collections.sort(inOut);
 	}
 	
-	public void run() {
+	public void run(int currentTime) {
+		if (tempoDeResposta == -1)
+			tempoDeResposta = currentTime - tempoDeChegada;
+
 		tempoDeExecucao--;
 		tempoRodando++;
 		tempoRodandoTotal++;
-	}
-	
-	public void setTempoDeResposta(int currentTime) {
-		this.tempoDeResposta = currentTime - this.tempoDeChegada ;
 	}
 	
 	public boolean shouldInOut() {

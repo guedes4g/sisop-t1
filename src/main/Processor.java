@@ -60,7 +60,7 @@ public class Processor {
 				System.out.print( "C" );
 			} else {
 				System.out.print(  running.get(0).id );
-				running.get(0).run();
+				running.get(0).run(currentTime);
 				tempoDeEsperaOpt = 1;
 			}
 			
@@ -119,7 +119,6 @@ public class Processor {
 		if(running.isEmpty()) return false;
 		if(running.get(0).tempoDeExecucao <= 0) {
 			lastp = running.remove(0);
-			lastp.setTempoDeResposta(currentTime-1);
 			done.add( lastp );
 			return true;
 		}
