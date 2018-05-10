@@ -34,11 +34,15 @@ public class Universe {
 	
 	public ArrayList<Process> getByTime(int t){
 		ArrayList<Process> res = new ArrayList<Process>();
-		for(int i = 0; i < listOfProcess.size(); i ++) {
-			if(listOfProcess.get(i).tempoDeChegada == t) {
-				res.add(listOfProcess.remove(i));
-			}
-		}
+
+		for (Process p : listOfProcess)
+			if (p.tempoDeChegada == t)
+				res.add(p);
+
+		for (Process p : res)
+			listOfProcess.remove(p);
+
+
 		return res;
 	}
 	

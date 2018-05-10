@@ -92,11 +92,14 @@ public class Processor {
 
 	private ArrayList<Process> endedInOut(){
 		ArrayList<Process> res = new ArrayList<>();
-		for(int i = 0 ; i < inOut.size(); i++) {
-			if(inOut.get(i).tempoDeInicioInOut + universe.inOutTime == currentTime) {
-				res.add(inOut.remove(i));
-			}
-		}
+
+		for (Process p : inOut)
+			if (p.tempoDeInicioInOut + universe.inOutTime == currentTime)
+				res.add(p);
+
+		for (Process p : res)
+			inOut.remove(p);
+
 		return res;
 	}
 	
