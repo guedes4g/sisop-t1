@@ -153,7 +153,6 @@ public class Processor {
 
 	private void checkInOutCurrent() {
 		ready.get(0).setInOutTime(currentTime);
-		ready.get(0).resetRunningTime();
 
 		inOut.add(ready.get(0));
 
