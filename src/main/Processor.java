@@ -15,7 +15,7 @@ public class Processor {
 	private Queue<String> outputRoundRobin = new LinkedList<String>();
 
 	private Universe universe;
-	private Process current = null;
+	private Process oldCurrent;
 
 	private int currentTime = 0;
 	
@@ -45,7 +45,7 @@ public class Processor {
 			//Third validation: check for time slice (sent in the input file)
 			else if( shouldEndTimeSlice() ) {
 				//reset the running time (since we will change context)
-				current.resetRunningTime();
+				ready.get(0).resetRunningTime();
 
 				//give another priority process the opportunity to run
 				rotate();
@@ -86,10 +86,10 @@ public class Processor {
 
 	private void runProcess() {
 		//execute it
-		current.run(currentTime);
+		ready.get(0).run(currentTime);
 
 		//log
-		outputRoundRobin.add(current.toString());
+		outputRoundRobin.add(ready.get(0).toString());
 	}
 
 	private void findProcessesToRun() {
@@ -105,16 +105,12 @@ public class Processor {
 		ready.addAll(plist);
 		ready.addAll(returnInOut);
 
-		//In case we just inserted a process, set it to current
-		if (current == null && !ready.isEmpty())
-			current = ready.get(0);
-
 		//Re-order the processes by their priority
 		orderRunningPriority();
 	}
 
 	private boolean shouldEndTimeSlice() {
-		return current != null ? current.getRunningTime() >= universe.getFatiaDeTempo() : false;
+		return !ready.isEmpty() ? ready.get(0).getRunningTime() >= universe.getFatiaDeTempo() : false;
 	}
 
 	private void printRoundRobin() {
@@ -152,36 +148,30 @@ public class Processor {
 	}
 	
 	private boolean shouldCheckInOutCurrent() {
-		return current != null && current.shouldInOut();
+		return !ready.isEmpty() && ready.get(0).shouldInOut();
 	}
 
 	private void checkInOutCurrent() {
+		ready.get(0).setInOutTime(currentTime);
+		ready.get(0).resetRunningTime();
+
+		inOut.add(ready.get(0));
+
 		ready.remove(0);
-
-		current.setInOutTime(currentTime);
-		current.resetRunningTime();
-
-		inOut.add(current);
-
-		//reset the current position and let the rotate decide
-		setNewCurrent();
 
 		outputRoundRobin.add("C");
 	}
 
 	private boolean hasCurrentProcessDone() {
-		return current != null && current.hasEnded();
+		return !ready.isEmpty() && ready.get(0).hasEnded();
 	}
 
 	private void endCurrentProcess() {
 		//Add into the done list
-		done.add(current);
+		done.add(ready.get(0));
 
 		//remove from running list
 		ready.remove(0);
-
-		//get a new current
-		setNewCurrent();
 
 		//and change the context
 		if (!hasFinishedExecution())
@@ -189,6 +179,11 @@ public class Processor {
 	}
 	
 	private void addWaitTime(boolean mustIncludeCurrent) {
+		Process current = null;
+
+		if (!ready.isEmpty())
+			current = ready.get(0);
+
 		//Increment the wait time for all the running jobs
 		for (Process p : ready)
 			//Check if the current process did not run
@@ -204,7 +199,7 @@ public class Processor {
 		if (ready.isEmpty())
 			return false;
 
-		return current != ready.get(0);
+		return oldCurrent != ready.get(0);
 	}
 	
 	private void rotate() {
@@ -215,15 +210,14 @@ public class Processor {
 
 			//then means, we have more than one process to give the opportunity to run
 			if (gap > 0) {
+				Process current = ready.get(0);
+
 				//remove the current from the queue
 			 	ready.remove(current);
 
 			 	//add into the new position (based on gap)
 			 	ready.add(gap -1, current);
 			}
-
-			//always refresh the current
-			setNewCurrent();
 		}
 
 		//change context
@@ -234,20 +228,17 @@ public class Processor {
 		int res = 0;
 
 		for (Process p : ready)
-			if (current.getPriority() >= p.getPriority())
+			if (ready.get(0).getPriority() >= p.getPriority())
 				res++;
 
 		return res;
 	}
-
-	private void setNewCurrent() {
-		if (!ready.isEmpty())
-			current = ready.get(0);
-	}
 	
 	private void orderRunningPriority() {
-		if(!ready.isEmpty())
+		if(!ready.isEmpty()) {
+			oldCurrent = ready.get(0);
 			Process.sortByPriority(ready);
+		}
 	}
 	
 }
